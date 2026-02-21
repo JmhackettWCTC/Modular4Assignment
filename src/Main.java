@@ -21,9 +21,19 @@ public class Main {
         System.out.println("2) View rooms");
         System.out.println("3) Read rooms from file");
         System.out.println("4) Write rooms to file");
-        System.out.println("5) Exit program");
-        System.out.print("Enter choice: ");
+        System.out.println("5) Configure paint settings");
+        System.out.println("6) Exit program");
     }
+
+
+    private static void configurePaintSettings() {
+        double coverage = promptForDimension("coverage per gallon (square feet)");
+        double price = promptForDimension("price per gallon");
+        paintCalculator.setCoveragePerGallon(coverage);
+        paintCalculator.setPricePerGallon(price);
+        System.out.println("Paint settings updated.");
+    }
+
 
     // Prompts user for a single dimension (e.g., length) and returns it
     // Repeats until a valid positive number is entered
@@ -122,7 +132,6 @@ public class Main {
                     createRoom();
                     break;
                 case 2:
-                    // Display areas of all rooms
                     System.out.println(paintCalculator.toString());
                     break;
                 case 3:
@@ -132,6 +141,9 @@ public class Main {
                     writeFile();
                     break;
                 case 5:
+                    configurePaintSettings();
+                    break;
+                case 6:
                     done = true;
                     System.out.println("Exiting program.");
                     break;
