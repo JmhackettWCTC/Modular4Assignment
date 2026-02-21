@@ -7,11 +7,15 @@ import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+// Entry point and user interface for the paint calculator program
 public class Main {
 
+    // Shared Scanner for all user input
     private static Scanner keyboard = new Scanner(System.in);
+    // Shared PaintCalculator that holds all rooms
     private static PaintCalculator paintCalculator = new PaintCalculator();
 
+    // Prints the main menu options
     private static void printMenu() {
         System.out.println("1) Add room");
         System.out.println("2) View rooms");
@@ -21,6 +25,8 @@ public class Main {
         System.out.print("Enter choice: ");
     }
 
+    // Prompts user for a single dimension (e.g., length) and returns it
+    // Repeats until a valid positive number is entered
     private static double promptForDimension(String dimensionName) {
         while (true) {
             System.out.print("Enter " + dimensionName + ": ");
@@ -32,12 +38,14 @@ public class Main {
                     return value;
                 }
             } catch (InputMismatchException e) {
+                // Handle non-numeric input
                 System.out.println("Please enter a valid number.");
-                keyboard.nextLine(); // clear bad input
+                keyboard.nextLine(); // Clear invalid input from the buffer
             }
         }
     }
 
+    // Creates a room using user-entered dimensions and adds it to the calculator
     private static void createRoom() {
         double length = promptForDimension("length");
         double width = promptForDimension("width");
@@ -46,13 +54,20 @@ public class Main {
         System.out.println("Room added.");
     }
 
+    // Reads a PaintCalculator object from a file
+    // Replaces the current paintCalculator if successful
     private static void readFile() {
         System.out.print("Enter file name to read from: ");
-        keyboard.nextLine(); // consume leftover newline
+        keyboard.nextLine(); // Consume leftover newline from previous numeric input
         String fileName = keyboard.nextLine();
+
+        // Try-with-resources ensures the stream is closed automatically
         try (ObjectInputStream ois =
                      new ObjectInputStream(new FileInputStream(fileName))) {
+
             Object obj = ois.readObject();
+
+            // Ensure the object in the file is a PaintCalculator
             if (obj instanceof PaintCalculator) {
                 paintCalculator = (PaintCalculator) obj;
                 System.out.println("Rooms loaded from file.");
@@ -60,41 +75,54 @@ public class Main {
                 System.out.println("File does not contain a PaintCalculator object.");
             }
         } catch (IOException | ClassNotFoundException e) {
+            // Print a friendly error message if reading fails
             System.out.println("Error reading from file: " + e.getMessage());
         }
     }
 
+    // Writes the current PaintCalculator object to a file
     private static void writeFile() {
         System.out.print("Enter file name to write to: ");
-        keyboard.nextLine(); // consume leftover newline
+        keyboard.nextLine(); // Consume leftover newline from previous numeric input
         String fileName = keyboard.nextLine();
+
+        // Try-with-resources ensures the stream is closed automatically
         try (ObjectOutputStream oos =
                      new ObjectOutputStream(new FileOutputStream(fileName))) {
+
+            // Serialize the paintCalculator to the file
             oos.writeObject(paintCalculator);
             System.out.println("Rooms saved to file.");
         } catch (IOException e) {
+            // Print a friendly error message if writing fails
             System.out.println("Error writing to file: " + e.getMessage());
         }
     }
 
+    // Main loop: shows menu, reads user choice, and calls the appropriate method
     public static void main(String[] args) {
         boolean done = false;
+
         while (!done) {
             printMenu();
+
             int choice;
             try {
                 choice = keyboard.nextInt();
             } catch (InputMismatchException e) {
+                // Handle non-numeric menu choices
                 System.out.println("Invalid choice.");
-                keyboard.nextLine(); // clear bad input
+                keyboard.nextLine(); // Clear invalid input
                 continue;
             }
 
+            // Dispatch based on user's menu selection
             switch (choice) {
                 case 1:
                     createRoom();
                     break;
                 case 2:
+                    // Display areas of all rooms
                     System.out.println(paintCalculator.toString());
                     break;
                 case 3:
@@ -110,7 +138,7 @@ public class Main {
                 default:
                     System.out.println("Invalid choice.");
             }
-            System.out.println();
+            System.out.println(); // Blank line for readability between iterations
         }
     }
 }
